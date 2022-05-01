@@ -26,7 +26,7 @@ export class ExerciseTest extends Model<ExerciseTest> {
   name: string;
 
   @Column
-  inputCode: string;
+  code: string;
 
   @Column
   expectedResult: string;

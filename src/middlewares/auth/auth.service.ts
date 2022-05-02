@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/routes/user/entities/user.entity';
 import { UserService } from 'src/routes/user/user.service';
@@ -43,10 +43,12 @@ export class AuthService {
     user.password = hashPassword;
 
     // save user in db
-    const userData = await user.save();
+    await user.save();
 
     // return the token
-    return this.login(new LoginUserDto(user.email, createUserDto.password));
+    return await this.login(
+      new LoginUserDto(user.email, createUserDto.password),
+    );
   }
 
   async login(body: LoginUserDto): Promise<any> {
@@ -60,17 +62,10 @@ export class AuthService {
       );
     }
 
-    // get user role
-    let userRoles = ['user'];
-    if (user.isAdmin) {
-      userRoles.push('admin');
-    }
-
     // info to stock in the token
     const payload = {
       username: user.username,
       id: user.id,
-      roles: userRoles,
     };
 
     // sign token

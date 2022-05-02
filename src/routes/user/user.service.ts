@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Op } from 'sequelize';
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { UserDto } from './dto/user.dto';
@@ -12,33 +12,43 @@ export class UserService {
     private userModel: typeof User,
   ) {}
 
-  async findAll() {
-    const users = await this.userModel.findAll<User>();
+  // async findAll() {
+  //   const users = await this.userModel.findAll<User>();
 
-    // UserDto: don't return password
-    return users.map((user) => new UserDto(user));
-  }
+  //   // UserDto: don't return password
+  //   return users.map((user) => new UserDto(user));
+  // }
 
-  async findOne(id: string) {
+  async findOne(id: string, req: any) {
+    // verify the authorization
+    if (!this.hasTheAuthorization(id, req)) {
+      throw new HttpException(
+        'You cannot access this user',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const user = await this.userModel.findByPk<User>(id);
 
-    return new UserDto(user);
-  }
-
-  async findOneByEmail(email: string) {
-    const user = await this.userModel.findOne<User>({ where: { email } });
+    if (!user) {
+      throw new HttpException("User doesn't existe", HttpStatus.NOT_FOUND);
+    }
 
     return new UserDto(user);
   }
 
-  async findOneByEmailForLogin(email: string) {
-    return await this.userModel.findOne<User>({ where: { email } });
-  }
-
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.userModel.findByPk(id);
+  async update(id: string, req: any, updateUserDto: UpdateUserDto) {
+    // verify the authorization
+    if (!this.hasTheAuthorization(id, req)) {
+      throw new HttpException(
+        'You cannot update this user',
+        HttpStatus.FORBIDDEN,
+      );
+    }
 
     // update user
+    const user = await this.userModel.findByPk(id);
+
     user.username = updateUserDto.username || user.username;
     user.email = updateUserDto.email || user.email;
     user.isAdmin = updateUserDto.isAdmin || false;
@@ -53,18 +63,41 @@ export class UserService {
     return new UserDto(userData);
   }
 
-  async remove(id: string) {
+  async remove(id: string, req: any) {
+    // verify the authorization
+    if (!this.hasTheAuthorization(id, req)) {
+      throw new HttpException(
+        'You cannot remove this user',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    // delete the user
     const user = await this.userModel.findByPk<User>(id);
     await user.destroy();
 
     return new UserDto(user);
   }
 
-  async doesUserAlreadyExist(username, email) {
+  async findOneByEmail(email: string) {
+    const user = await this.userModel.findOne<User>({ where: { email } });
+
+    return new UserDto(user);
+  }
+
+  async findOneByEmailForLogin(email: string) {
+    return await this.userModel.findOne<User>({ where: { email } });
+  }
+
+  async doesUserAlreadyExist(username: string, email: string) {
     return await this.userModel.findOne({
       where: {
         [Op.or]: [{ username: username }, { email: email }],
       },
     });
+  }
+
+  hasTheAuthorization(id: string, req: any) {
+    return req.user && req.user.userId == id;
   }
 }

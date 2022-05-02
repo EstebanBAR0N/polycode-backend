@@ -31,6 +31,11 @@ export class AuthService {
       );
     }
 
+    // check if same passwords
+    if (!(createUserDto.password === createUserDto.confirmPassword)) {
+      throw new HttpException("Passwords don't match", HttpStatus.CONFLICT);
+    }
+
     // create user from body info
     const user = new User();
 
@@ -51,27 +56,20 @@ export class AuthService {
     );
   }
 
-  async login(body: LoginUserDto): Promise<any> {
-    // get user in bdd
-    const user = await this.userService.findOneByEmail(body.email);
-
-    if (!user) {
-      throw new HttpException(
-        'Invalid email or password.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  async login(req: any): Promise<any> {
+    // get user data
+    const user = req.user.dataValues;
 
     // info to stock in the token
     const payload = {
-      username: user.username,
       id: user.id,
+      username: user.username,
     };
 
     // sign token
     const jwt_token = this.jwtService.sign(payload);
 
-    // TODO: add token to bdd
+    // add token to bdd
     await this.storeTokenInDatabase(user.id, jwt_token);
 
     return {
@@ -79,8 +77,12 @@ export class AuthService {
     };
   }
 
-  async logout(tokenStr: string) {
-    const token = tokenStr.split(' ')[1];
+  async logout(composedToken: string) {
+    const token = composedToken.split(' ')[1];
+
+    if (!token) {
+      throw new HttpException("Token doesn't existe", HttpStatus.BAD_REQUEST);
+    }
 
     // delete token in database;
     const tokenDelete = await this.tokenService.remove(token);

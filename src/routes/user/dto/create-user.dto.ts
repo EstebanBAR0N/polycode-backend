@@ -1,6 +1,7 @@
-import { IsString, IsNotEmpty, IsEmail, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, Length } from 'class-validator';
 
 export class CreateUserDto {
+  @Length(3, 15)
   @IsString()
   @IsNotEmpty()
   readonly username: string;
@@ -9,9 +10,15 @@ export class CreateUserDto {
   @IsNotEmpty()
   readonly email: string;
 
+  @Length(5, 20)
   @IsString()
   @IsNotEmpty()
   readonly password: string;
+
+  @Length(5, 20)
+  @IsString()
+  @IsNotEmpty()
+  readonly confirmPassword: string;
 
   readonly isAdmin: boolean;
 }

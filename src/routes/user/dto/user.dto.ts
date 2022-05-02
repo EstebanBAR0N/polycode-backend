@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsEmail, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEmail,
+  IsBoolean,
+  Length,
+} from 'class-validator';
 import { User } from '../entities/user.entity';
 
 export class UserDto {
@@ -6,6 +12,7 @@ export class UserDto {
   @IsNotEmpty()
   readonly id: string;
 
+  @Length(3, 15)
   @IsString()
   @IsNotEmpty()
   readonly username: string;

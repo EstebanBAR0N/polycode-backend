@@ -18,7 +18,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string, @Request() req) {
+  findOne(@Param('id') id: string, @Request() req: any) {
     return this.userService.findOne(id, req);
   }
 
@@ -26,7 +26,7 @@ export class UserController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Request() req,
+    @Request() req: any,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.userService.update(id, req, updateUserDto);
@@ -34,7 +34,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Request() req) {
+  remove(@Param('id') id: string, @Request() req: any) {
     return this.userService.remove(id, req);
   }
 }

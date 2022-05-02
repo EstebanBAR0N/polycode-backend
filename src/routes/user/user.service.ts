@@ -12,13 +12,6 @@ export class UserService {
     private userModel: typeof User,
   ) {}
 
-  // async findAll() {
-  //   const users = await this.userModel.findAll<User>();
-
-  //   // UserDto: don't return password
-  //   return users.map((user) => new UserDto(user));
-  // }
-
   async findOne(id: string, req: any) {
     // verify the authorization
     if (!this.hasTheAuthorization(id, req)) {
@@ -31,7 +24,7 @@ export class UserService {
     const user = await this.userModel.findByPk<User>(id);
 
     if (!user) {
-      throw new HttpException("User doesn't existe", HttpStatus.NOT_FOUND);
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     return new UserDto(user);
@@ -48,6 +41,10 @@ export class UserService {
 
     // update user
     const user = await this.userModel.findByPk(id);
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
 
     user.username = updateUserDto.username || user.username;
     user.email = updateUserDto.email || user.email;
@@ -74,6 +71,11 @@ export class UserService {
 
     // delete the user
     const user = await this.userModel.findByPk<User>(id);
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
     await user.destroy();
 
     return new UserDto(user);

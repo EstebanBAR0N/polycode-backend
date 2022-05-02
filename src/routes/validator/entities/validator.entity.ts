@@ -11,8 +11,8 @@ import {
 } from 'sequelize-typescript';
 import { Exercise } from 'src/routes/exercise/entities/exercise.entity';
 
-@Table({ tableName: 'ExerciseTest' })
-export class ExerciseTest extends Model<ExerciseTest> {
+@Table({ tableName: 'Validator' })
+export class Validator extends Model<Validator> {
   @PrimaryKey
   @Column({
     type: DataType.UUID,

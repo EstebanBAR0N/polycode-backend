@@ -8,7 +8,7 @@ import { ChallengeModule } from './routes/challenge/challenge.module';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './middlewares/auth/auth.module';
 import { ExerciseModule } from './routes/exercise/exercise.module';
-import { ExerciseTestModule } from './routes/exercise-test/exercise-test.module';
+import { ValidatorModule } from './routes/validator/validator.module';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { ExerciseTestModule } from './routes/exercise-test/exercise-test.module'
     DatabaseModule,
     AuthModule,
     ExerciseModule,
-    ExerciseTestModule,
+    ValidatorModule,
     ConfigModule.forRoot(),
   ],
   controllers: [AppController],

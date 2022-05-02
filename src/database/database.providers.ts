@@ -3,7 +3,7 @@ import { User } from 'src/routes/user/entities/user.entity';
 import { Token } from 'src/routes/token/entities/token.entity';
 import { Exercise } from 'src/routes/exercise/entities/exercise.entity';
 import { UserExercise } from 'src/routes/user/entities/user-exercise.entity';
-import { ExerciseTest } from 'src/routes/exercise-test/entities/exercise-test.entity';
+import { Validator } from 'src/routes/validator/entities/validator.entity';
 import { Challenge } from 'src/routes/challenge/entities/challenge.entity';
 
 export const databaseProviders = [
@@ -18,7 +18,7 @@ export const databaseProviders = [
         Exercise,
         UserExercise,
         Token,
-        ExerciseTest,
+        Validator,
         Challenge,
       ]);
       await sequelize.sync();

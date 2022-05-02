@@ -12,7 +12,7 @@ import {
   BelongsToMany,
 } from 'sequelize-typescript';
 import { User } from 'src/routes/user/entities/user.entity';
-import { ExerciseTest } from 'src/routes/exercise-test/entities/exercise-test.entity';
+import { Validator } from 'src/routes/validator/entities/validator.entity';
 import { Challenge } from 'src/routes/challenge/entities/challenge.entity';
 import { UserExercise } from 'src/routes/user/entities/user-exercise.entity';
 
@@ -48,8 +48,8 @@ export class Exercise extends Model<Exercise> {
   @BelongsToMany(() => User, () => UserExercise)
   users: User[];
 
-  @HasMany(() => ExerciseTest)
-  tests: ExerciseTest[];
+  @HasMany(() => Validator)
+  tests: Validator[];
 
   @ForeignKey(() => Challenge)
   @Column({

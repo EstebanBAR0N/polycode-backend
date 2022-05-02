@@ -6,7 +6,7 @@ import { UserModule } from './routes/user/user.module';
 import { TokenModule } from './routes/token/token.module';
 import { ChallengeModule } from './routes/challenge/challenge.module';
 import { DatabaseModule } from './database/database.module';
-import { AuthModule } from './middlewares/auth/auth.module';
+import { AuthModule } from './auth/auth.module';
 import { ExerciseModule } from './routes/exercise/exercise.module';
 import { ValidatorModule } from './routes/validator/validator.module';
 

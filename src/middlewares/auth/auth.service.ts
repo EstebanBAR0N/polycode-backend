@@ -3,6 +3,7 @@ import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/routes/user/entities/user.entity';
 import { UserService } from 'src/routes/user/user.service';
+import { TokenService } from 'src/routes/token/token.service';
 import { CreateUserDto } from 'src/routes/user/dto/create-user.dto';
 import { LoginUserDto } from 'src/routes/user/dto/login-user.dto';
 import { Token } from 'src/routes/token/entities/token.entity';
@@ -12,7 +13,41 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private userService: UserService,
+    private tokenService: TokenService,
   ) {}
+
+  // TODO: envoi de mail
+  async register(createUserDto: CreateUserDto) {
+    // check if user already exists
+    const userAlreadyExist = await this.userService.doesUserAlreadyExist(
+      createUserDto.username,
+      createUserDto.email,
+    );
+
+    if (userAlreadyExist) {
+      throw new HttpException(
+        'email or username already exists',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    // create user from body info
+    const user = new User();
+
+    user.username = createUserDto.username;
+    user.email = createUserDto.email;
+    user.isAdmin = false;
+
+    // hashed password
+    const hashPassword = await bcrypt.hash(createUserDto.password, 10);
+    user.password = hashPassword;
+
+    // save user in db
+    const userData = await user.save();
+
+    // return the token
+    return this.login(new LoginUserDto(user.email, createUserDto.password));
+  }
 
   async login(body: LoginUserDto): Promise<any> {
     // get user in bdd
@@ -49,37 +84,13 @@ export class AuthService {
     };
   }
 
-  // TODO: envoi de mail
-  async register(createUserDto: CreateUserDto) {
-    // check if user already exists
-    const userAlreadyExist = await this.userService.doesUserAlreadyExist(
-      createUserDto.username,
-      createUserDto.email,
-    );
+  async logout(tokenStr: string) {
+    const token = tokenStr.split(' ')[1];
 
-    if (userAlreadyExist) {
-      throw new HttpException(
-        'email or username already exists',
-        HttpStatus.CONFLICT,
-      );
-    }
+    // delete token in database;
+    const tokenDelete = await this.tokenService.remove(token);
 
-    // create user from body info
-    const user = new User();
-
-    user.username = createUserDto.username;
-    user.email = createUserDto.email;
-    user.isAdmin = false;
-
-    // hashed password
-    const hashPassword = await bcrypt.hash(createUserDto.password, 10);
-    user.password = hashPassword;
-
-    // save user in db
-    const userData = await user.save();
-
-    // return the token
-    return this.login(new LoginUserDto(user.email, createUserDto.password));
+    return tokenDelete;
   }
 
   async validateUser(loginUserDto: LoginUserDto): Promise<any> {

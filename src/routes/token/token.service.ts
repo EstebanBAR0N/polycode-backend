@@ -1,9 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { CreateTokenDto } from './dto/create-token.dto';
 import { UpdateTokenDto } from './dto/update-token.dto';
+import { Token } from './entities/token.entity';
 
 @Injectable()
 export class TokenService {
+  constructor(
+    @Inject('tokenModel')
+    private tokenModel: typeof Token,
+  ) {}
+
   create(createTokenDto: CreateTokenDto) {
     return 'This action adds a new token';
   }
@@ -20,7 +26,10 @@ export class TokenService {
     return `This action updates a #${id} token`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} token`;
+  async remove(tokenPk: string) {
+    const token = await this.tokenModel.findByPk<Token>(tokenPk);
+    await token.destroy();
+
+    return token;
   }
 }

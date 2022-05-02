@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { TokenService } from './token.service';
 import { CreateTokenDto } from './dto/create-token.dto';
 import { UpdateTokenDto } from './dto/update-token.dto';
@@ -29,6 +37,6 @@ export class TokenController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.tokenService.remove(+id);
+    return this.tokenService.remove(id);
   }
 }

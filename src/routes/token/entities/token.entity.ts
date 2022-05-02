@@ -14,13 +14,6 @@ import { User } from 'src/routes/user/entities/user.entity';
 @Table({ tableName: 'Token' })
 export class Token extends Model<Token> {
   @PrimaryKey
-  @Column({
-    type: DataType.UUID,
-    defaultValue: DataType.UUIDV4,
-  })
-  id: string;
-
-  @Unique
   @Column
   token: string;
 

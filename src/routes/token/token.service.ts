@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateTokenDto } from './dto/create-token.dto';
 import { UpdateTokenDto } from './dto/update-token.dto';
 import { Token } from './entities/token.entity';
@@ -28,6 +28,11 @@ export class TokenService {
 
   async remove(tokenPk: string) {
     const token = await this.tokenModel.findByPk<Token>(tokenPk);
+
+    if (!token) {
+      throw new HttpException("Token doesn't existe", HttpStatus.BAD_REQUEST);
+    }
+
     await token.destroy();
 
     return token;

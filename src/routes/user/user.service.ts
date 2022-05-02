@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+import { Op } from 'sequelize';
 import { Injectable, Inject } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -57,5 +58,13 @@ export class UserService {
     await user.destroy();
 
     return new UserDto(user);
+  }
+
+  async doesUserAlreadyExist(username, email) {
+    return await this.userModel.findOne({
+      where: {
+        [Op.or]: [{ username: username }, { email: email }],
+      },
+    });
   }
 }

@@ -36,9 +36,6 @@ export class Exercise extends Model<Exercise> {
   @Column
   expectedResult: string;
 
-  @Column({ defaultValue: '' })
-  image: string;
-
   @Column({
     defaultValue: 1,
     validate: {

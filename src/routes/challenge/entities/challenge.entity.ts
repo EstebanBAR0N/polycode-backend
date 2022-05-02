@@ -25,9 +25,6 @@ export class Challenge extends Model<Challenge> {
   @Column
   name: string;
 
-  @Column({ defaultValue: '' })
-  image: string;
-
   @Column
   langage: Langage;
 

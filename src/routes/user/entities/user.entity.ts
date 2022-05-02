@@ -33,11 +33,11 @@ export class User extends Model<User> {
   @Column
   email: string;
 
+  @Column({ defaultValue: false })
+  isEmailConfirmed: boolean;
+
   @Column
   password: string;
-
-  @Column({ defaultValue: '' })
-  image: string;
 
   @Column({ defaultValue: false })
   isAdmin: boolean;

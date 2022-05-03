@@ -31,12 +31,15 @@ export class UserService {
   }
 
   async update(id: string, req: any, updateUserDto: UpdateUserDto) {
+    // check if user already exists
+    const userAlreadyExist = await this.doesUserAlreadyExist(
+      updateUserDto.username,
+      updateUserDto.email,
+    );
+
     // verify the authorization
-    if (!this.hasTheAuthorization(id, req)) {
-      throw new HttpException(
-        'You cannot update this user',
-        HttpStatus.FORBIDDEN,
-      );
+    if (!this.hasTheAuthorization(id, req) || userAlreadyExist) {
+      throw new HttpException('User cannot be updated', HttpStatus.FORBIDDEN);
     }
 
     // update user
@@ -51,8 +54,10 @@ export class UserService {
     user.isAdmin = updateUserDto.isAdmin || false;
 
     // update password
-    const hashPassword = await bcrypt.hash(updateUserDto.password, 10);
-    user.password = hashPassword || user.password;
+    if (updateUserDto.password) {
+      const hashPassword = await bcrypt.hash(updateUserDto.password, 10);
+      user.password = hashPassword || user.password;
+    }
 
     // change user in db
     let userData = await user.save();
@@ -92,11 +97,20 @@ export class UserService {
   }
 
   async doesUserAlreadyExist(username: string, email: string) {
-    return await this.userModel.findOne({
-      where: {
-        [Op.or]: [{ username: username }, { email: email }],
-      },
-    });
+    let query = {};
+    if (username && email) {
+      query = {
+        where: {
+          [Op.or]: [{ username: username }, { email: email }],
+        },
+      };
+    } else if (username) {
+      query = { where: { username } };
+    } else {
+      query = { where: { email } };
+    }
+
+    return await this.userModel.findOne(query);
   }
 
   hasTheAuthorization(id: string, req: any) {

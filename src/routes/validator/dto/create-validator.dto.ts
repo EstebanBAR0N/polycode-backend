@@ -13,4 +13,7 @@ export class CreateValidatorDto {
   @IsString()
   @IsNotEmpty()
   expectedResult: string;
+
+  @IsString()
+  exerciseId: string;
 }

@@ -14,5 +14,9 @@ export class CreateExerciseDto {
   @IsNotEmpty()
   expectedResult: string;
 
+  @IsNotEmpty()
   difficultyLevel: number;
+
+  @IsString()
+  challengeId: string;
 }

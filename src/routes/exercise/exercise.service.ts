@@ -31,6 +31,7 @@ export class ExerciseService {
     exercise.instructions = createExerciseDto.instructions;
     exercise.expectedResult = createExerciseDto.expectedResult;
     exercise.difficultyLevel = createExerciseDto.difficultyLevel;
+    exercise.challengeId = createExerciseDto.challengeId;
 
     // save exercise in db
     return await exercise.save();
@@ -81,6 +82,8 @@ export class ExerciseService {
       updateExerciseDto.instructions || exercise.instructions;
     exercise.expectedResult =
       updateExerciseDto.expectedResult || exercise.expectedResult;
+    exercise.difficultyLevel = updateExerciseDto.difficultyLevel;
+    exercise.challengeId = updateExerciseDto.challengeId;
 
     // modify exercise in db
     return await exercise.save();

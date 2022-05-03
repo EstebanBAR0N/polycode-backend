@@ -1,4 +1,4 @@
-export enum Langage {
+export enum Language {
   JAVA = 'java',
   JAVASCRIPT = 'javascript',
   PYTHON = 'python',

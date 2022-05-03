@@ -30,6 +30,7 @@ export class ValidatorService {
     validator.name = createValidatorDto.name;
     validator.entryValue = createValidatorDto.entryValue;
     validator.expectedResult = createValidatorDto.expectedResult;
+    validator.exerciseId = createValidatorDto.exerciseId;
 
     // save validator in db
     return await validator.save();
@@ -80,6 +81,8 @@ export class ValidatorService {
       updateValidatorDto.entryValue || validator.entryValue;
     validator.expectedResult =
       updateValidatorDto.expectedResult || validator.expectedResult;
+    validator.exerciseId =
+      updateValidatorDto.exerciseId || validator.exerciseId;
 
     // modify validator in db
     return await validator.save();

@@ -86,6 +86,7 @@ export class UserService {
     return new UserDto(user);
   }
 
+  // other functions
   async findOneByEmail(email: string) {
     const user = await this.userModel.findOne<User>({ where: { email } });
 

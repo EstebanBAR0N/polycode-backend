@@ -90,6 +90,7 @@ export class AuthService {
     return tokenDelete;
   }
 
+  // other functions
   async validateUser(loginUserDto: LoginUserDto): Promise<any> {
     // get user in bdd
     const user = await this.userService.findOneByEmailForLogin(

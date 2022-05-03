@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
@@ -26,8 +27,8 @@ export class ExerciseController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.exerciseService.findAll();
+  findAll(@Query() query: { challengeId: string }) {
+    return this.exerciseService.findAll(query);
   }
 
   @UseGuards(JwtAuthGuard)

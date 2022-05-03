@@ -37,8 +37,13 @@ export class ExerciseService {
     return await exercise.save();
   }
 
-  async findAll() {
-    return await this.exerciseModel.findAll();
+  async findAll(query: any) {
+    let finalQuery = {};
+    if (query.challengeId) {
+      finalQuery = { where: { challengeId: query.challengeId } };
+    }
+
+    return await this.exerciseModel.findAll(finalQuery);
   }
 
   async findOne(id: string) {

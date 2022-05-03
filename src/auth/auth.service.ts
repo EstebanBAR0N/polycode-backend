@@ -122,4 +122,10 @@ export class AuthService {
 
     await token_obj.save();
   }
+
+  async isEmailConfirmed(userId: string) {
+    const user = await this.userService.findOneById(userId);
+
+    return user && user.isEmailConfirmed;
+  }
 }

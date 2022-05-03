@@ -21,6 +21,9 @@ export class UserDto {
   @IsNotEmpty()
   readonly email: string;
 
+  @IsBoolean()
+  readonly isEmailConfirmed: boolean;
+
   @IsNotEmpty()
   @IsBoolean()
   readonly isAdmin: boolean;
@@ -30,5 +33,6 @@ export class UserDto {
     this.username = user.username;
     this.email = user.email;
     this.isAdmin = user.isAdmin;
+    this.isEmailConfirmed = user.isEmailConfirmed;
   }
 }

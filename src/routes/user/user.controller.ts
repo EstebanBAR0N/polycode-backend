@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { EmailConfirmationUserDto } from './dto/email-confirmation-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('user')
@@ -30,6 +31,14 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.userService.update(id, req, updateUserDto);
+  }
+
+  @Patch('confirm-email/:id')
+  emailConfirmation(
+    @Param('id') id: string,
+    @Body() emailConfirmationUserDto: EmailConfirmationUserDto,
+  ) {
+    return this.userService.emailConfirmation(id, emailConfirmationUserDto);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -19,6 +19,4 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   readonly confirmPassword: string;
-
-  readonly isAdmin: boolean;
 }

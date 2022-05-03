@@ -2,6 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { Op } from 'sequelize';
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { EmailConfirmationUserDto } from './dto/email-confirmation-user.dto';
 import { User } from './entities/user.entity';
 import { UserDto } from './dto/user.dto';
 
@@ -65,6 +66,34 @@ export class UserService {
     return new UserDto(userData);
   }
 
+  async emailConfirmation(
+    id: string,
+    emailConfirmationUserDto: EmailConfirmationUserDto,
+  ) {
+    // update user
+    const user = await this.userModel.findByPk(id);
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (
+      emailConfirmationUserDto.confirmationEmailToken ===
+      process.env.CONFIRMATION_EMAIL_TOKEN
+    ) {
+      user.isEmailConfirmed = true;
+      // change user in db
+      await user.save();
+
+      return 'Email confirmed';
+    }
+
+    throw new HttpException(
+      'Incorrect email confirmaton token',
+      HttpStatus.FORBIDDEN,
+    );
+  }
+
   async remove(id: string, req: any) {
     // verify the authorization
     if (!this.hasTheAuthorization(id, req)) {
@@ -87,6 +116,12 @@ export class UserService {
   }
 
   // other functions
+  async findOneById(id: string) {
+    const user = await this.userModel.findByPk<User>(id);
+
+    return new UserDto(user);
+  }
+
   async findOneByEmail(email: string) {
     const user = await this.userModel.findOne<User>({ where: { email } });
 

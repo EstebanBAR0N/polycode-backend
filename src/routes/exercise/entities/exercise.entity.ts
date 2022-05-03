@@ -26,7 +26,7 @@ export class Exercise extends Model<Exercise> {
   id: string;
 
   @Unique
-  @Length({ min: 3, max: 15 })
+  @Length({ min: 3, max: 30 })
   @Column
   name: string;
 

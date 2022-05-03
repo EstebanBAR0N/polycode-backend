@@ -26,7 +26,7 @@ export class Validator extends Model<Validator> {
   name: string;
 
   @Column
-  code: string;
+  entryValue: string;
 
   @Column
   expectedResult: string;

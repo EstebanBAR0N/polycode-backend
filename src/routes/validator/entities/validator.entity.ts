@@ -18,7 +18,7 @@ export class Validator extends Model<Validator> {
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
   })
-  id: string;
+  declare id: string;
 
   @Unique
   @Length({ min: 3, max: 15 })

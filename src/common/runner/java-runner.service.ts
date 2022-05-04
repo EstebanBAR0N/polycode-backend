@@ -19,7 +19,11 @@ export class JavaRunnerService extends RunnerService {
     result = await docker
       .run(
         'openjdk',
-        ['sh', '-c', `echo "${code}" > index.java; java index.java`],
+        [
+          'sh',
+          '-c',
+          `echo "${code.replaceAll('\"', '\\"')}" > index.java; java index.java`,
+        ],
         [stdout, stderr],
         { Tty: false },
       )

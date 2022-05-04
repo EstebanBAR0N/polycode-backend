@@ -19,7 +19,7 @@ export class RustRunnerService extends RunnerService {
     result = await docker
       .run(
         'rust',
-        ['sh', '-c', `echo "${code}" > index.rs; rustc index.rs; ./index`],
+        ['sh', '-c', `echo "${code.replaceAll('\"', '\\"')}" > index.rs; rustc index.rs; ./index`],
         [stdout, stderr],
         { Tty: false },
       )

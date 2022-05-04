@@ -21,7 +21,7 @@ export class User extends Model<User> {
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
   })
-  id: string;
+  declare id: string;
 
   @Unique
   @Length({ min: 3, max: 15 })

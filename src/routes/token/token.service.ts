@@ -8,6 +8,10 @@ export class TokenService {
     private tokenModel: typeof Token,
   ) {}
 
+  async create(token: Token) {
+    return await this.tokenModel.create(token);
+  }
+
   async remove(tokenPk: string) {
     const token = await this.tokenModel.findByPk<Token>(tokenPk);
 

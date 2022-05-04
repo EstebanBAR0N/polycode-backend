@@ -4,6 +4,7 @@ import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { EmailConfirmationUserDto } from './dto/email-confirmation-user.dto';
 import { User } from './entities/user.entity';
+import { UserExercise } from './entities/user-exercise.entity';
 import { UserDto } from './dto/user.dto';
 
 @Injectable()
@@ -11,6 +12,8 @@ export class UserService {
   constructor(
     @Inject('userModel')
     private userModel: typeof User,
+    @Inject('userExerciseModel')
+    private userExerciseModel: typeof UserExercise,
   ) {}
 
   async findOne(id: string, req: any) {
@@ -22,7 +25,10 @@ export class UserService {
       );
     }
 
-    const user = await this.userModel.findByPk<User>(id);
+    const user = await this.userModel.findOne<User>({
+      where: { id },
+      raw: true,
+    });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -40,58 +46,38 @@ export class UserService {
 
     // verify the authorization
     if (!this.hasTheAuthorization(id, req) || userAlreadyExist) {
-      throw new HttpException('User cannot be updated', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        "You haven't the authorization or the user already exist",
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     // update user
-    const user = await this.userModel.findByPk(id);
+    const user = await this.userModel.findOne({ where: { id }, raw: true });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
+    // update user
     user.username = updateUserDto.username || user.username;
     user.email = updateUserDto.email || user.email;
     user.isAdmin = updateUserDto.isAdmin || false;
 
-    // update password
     if (updateUserDto.password) {
+      // verify passwords
+      if (updateUserDto.password !== updateUserDto.confirmPassword) {
+        throw new HttpException("Passwords don't match", HttpStatus.CONFLICT);
+      }
+
       const hashPassword = await bcrypt.hash(updateUserDto.password, 10);
       user.password = hashPassword || user.password;
     }
 
-    // change user in db
-    let userData = await user.save();
+    // update user in db
+    await this.userModel.update(user, { where: { id } });
 
-    return new UserDto(userData);
-  }
-
-  async emailConfirmation(
-    id: string,
-    emailConfirmationUserDto: EmailConfirmationUserDto,
-  ) {
-    // update user
-    const user = await this.userModel.findByPk(id);
-
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
-
-    if (
-      emailConfirmationUserDto.confirmationEmailToken ===
-      process.env.CONFIRMATION_EMAIL_TOKEN
-    ) {
-      user.isEmailConfirmed = true;
-      // change user in db
-      await user.save();
-
-      return 'Email confirmed';
-    }
-
-    throw new HttpException(
-      'Incorrect email confirmaton token',
-      HttpStatus.FORBIDDEN,
-    );
+    return new UserDto(user);
   }
 
   async remove(id: string, req: any) {
@@ -103,33 +89,89 @@ export class UserService {
       );
     }
 
-    // delete the user
-    const user = await this.userModel.findByPk<User>(id);
+    // delete user in db
+    await this.userModel.destroy({ where: { id } });
+
+    return `User ${id} successfuly deleted`; //new UserDto(user);
+  }
+
+  // other functions
+  async emailConfirmation(
+    id: string,
+    emailConfirmationUserDto: EmailConfirmationUserDto,
+  ) {
+    // update user
+    const user = await this.userModel.findOne({ where: { id }, raw: true });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    await user.destroy();
+    if (user.isEmailConfirmed) {
+      throw new HttpException('Email already confirmed', HttpStatus.CONFLICT);
+    }
 
-    return new UserDto(user);
+    if (
+      emailConfirmationUserDto.confirmationEmailToken ===
+      process.env.EMAIL_CONFIRMATION_TOKEN
+    ) {
+      user.isEmailConfirmed = true;
+
+      // update user in db
+      await this.userModel.update(user, { where: { id } });
+
+      return `Email successfuly confirmed by ${id}`;
+    }
+    throw new HttpException(
+      'Incorrect email confirmaton token',
+      HttpStatus.FORBIDDEN,
+    );
   }
 
-  // other functions
+  async create(user: User) {
+    await this.userModel.create(user);
+  }
+
+  // TODO
+  // async updateUserExercise(
+  //   userId: string,
+  //   exerciseId: string,
+  //   isCompleted: boolean,
+  // ) {
+  //   await this.userExerciseModel.create({ isCompleted, userId, exerciseId });
+  // }
+
   async findOneById(id: string) {
-    const user = await this.userModel.findByPk<User>(id);
+    const user = await this.userModel.findOne<User>({
+      where: { id },
+      raw: true,
+    });
+
+    if (!user) {
+      throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
+    }
 
     return new UserDto(user);
   }
 
   async findOneByEmail(email: string) {
-    const user = await this.userModel.findOne<User>({ where: { email } });
+    const user = await this.userModel.findOne<User>({
+      where: { email },
+      raw: true,
+    });
+
+    if (!user) {
+      throw new HttpException(
+        `User with thie email: ${email} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     return new UserDto(user);
   }
 
-  async findOneByEmailForLogin(email: string) {
-    return await this.userModel.findOne<User>({ where: { email } });
+  async findOneByEmailForLogin(email: string): Promise<any> {
+    return await this.userModel.findOne<User>({ where: { email }, raw: true });
   }
 
   async doesUserAlreadyExist(username: string, email: string) {
@@ -141,7 +183,7 @@ export class UserService {
         },
       };
     } else if (username) {
-      query = { where: { username } };
+      query = { where: { username }, raw: true };
     } else {
       query = { where: { email } };
     }

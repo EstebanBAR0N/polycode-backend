@@ -4,14 +4,14 @@ import { Exercise } from 'src/routes/exercise/entities/exercise.entity';
 
 @Table({ tableName: 'UserExercise' })
 export class UserExercise extends Model<UserExercise> {
-  @Column({ defaultValue: false })
-  isTheChallengeCompleted: boolean;
+  @Column
+  isCompleted: boolean;
 
   @ForeignKey(() => User)
   @Column
-  userId: number;
+  userId: string;
 
   @ForeignKey(() => Exercise)
   @Column
-  exerciseId: number;
+  exerciseId: string;
 }

@@ -26,13 +26,13 @@ export class AuthService {
 
     if (userAlreadyExist) {
       throw new HttpException(
-        'email or username already exists',
+        'Email or username already exists',
         HttpStatus.CONFLICT,
       );
     }
 
     // check if same passwords
-    if (!(createUserDto.password === createUserDto.confirmPassword)) {
+    if (createUserDto.password !== createUserDto.confirmPassword) {
       throw new HttpException("Passwords don't match", HttpStatus.CONFLICT);
     }
 
@@ -41,6 +41,7 @@ export class AuthService {
 
     user.username = createUserDto.username;
     user.email = createUserDto.email;
+    user.isEmailConfirmed = false;
     user.isAdmin = false;
 
     // hashed password
@@ -48,17 +49,23 @@ export class AuthService {
     user.password = hashPassword;
 
     // save user in db
-    await user.save();
+    this.userService.create(user);
+
+    return `User ${user.id} successfuly created`;
 
     // return the token
-    return await this.login(
-      new LoginUserDto(user.email, createUserDto.password),
-    );
+    // return await this.login({
+    //   user: {
+    //     id: user.id,
+    //     username: user.username,
+    //     ...new LoginUserDto(user.email, createUserDto.password),
+    //   },
+    // });
   }
 
   async login(req: any): Promise<any> {
     // get user data
-    const user = req.user.dataValues;
+    const user = req.user;
 
     // info to stock in the token
     const payload = {
@@ -97,6 +104,10 @@ export class AuthService {
       loginUserDto.email,
     );
 
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
     // check password
     const isMatch = await bcrypt.compare(loginUserDto.password, user.password);
 
@@ -120,7 +131,7 @@ export class AuthService {
     token_obj.expirationDate = expirationDate;
     token_obj.userId = userId;
 
-    await token_obj.save();
+    await this.tokenService.create(token_obj);
   }
 
   async isEmailConfirmed(userId: string) {

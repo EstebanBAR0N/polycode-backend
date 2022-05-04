@@ -9,6 +9,7 @@ import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { ExerciseModule } from './routes/exercise/exercise.module';
 import { ValidatorModule } from './routes/validator/validator.module';
+import { RunnerModule } from './common/runner/runner.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ValidatorModule } from './routes/validator/validator.module';
     AuthModule,
     ExerciseModule,
     ValidatorModule,
+    RunnerModule,
     ConfigModule.forRoot(),
   ],
   controllers: [AppController],

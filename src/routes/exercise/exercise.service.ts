@@ -3,12 +3,21 @@ import { Exercise } from './entities/exercise.entity';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { CheckExerciseDto } from './dto/check-exercise.dto';
+import { Language } from 'src/common/enum/language';
+import { NodeRunnerService } from 'src/common/runner/node-runner.service';
+import { PythonRunnerService } from 'src/common/runner/python-runner.service';
+import { RustRunnerService } from 'src/common/runner/rust-runner.service';
+import { JavaRunnerService } from 'src/common/runner/java-runner.service';
 
 @Injectable()
 export class ExerciseService {
   constructor(
     @Inject('exerciseModel')
     private exerciseModel: typeof Exercise,
+    private nodeRunnerService: NodeRunnerService,
+    private pythonRunnerService: PythonRunnerService,
+    private rustRunnerService: RustRunnerService,
+    private javaRunnerService: JavaRunnerService,
   ) {}
 
   async create(createExerciseDto: CreateExerciseDto) {
@@ -116,6 +125,25 @@ export class ExerciseService {
   async runCode(checkExerciseDto: CheckExerciseDto) {
     const { language, inputCode } = checkExerciseDto;
 
-    return 'result of : ' + inputCode;
+    let result = { stdout: '', stderr: '' };
+
+    switch (language) {
+      case Language.JAVASCRIPT:
+        result = await this.nodeRunnerService.run(inputCode);
+        break;
+      case Language.PYTHON:
+        result = await this.pythonRunnerService.run(inputCode);
+        break;
+      case Language.RUST:
+        result = await this.rustRunnerService.run(inputCode);
+        break;
+      case Language.JAVA:
+        result = await this.javaRunnerService.run(inputCode);
+        break;
+      default:
+        throw new HttpException('Language not found', HttpStatus.NOT_FOUND);
+    }
+
+    return result;
   }
 }

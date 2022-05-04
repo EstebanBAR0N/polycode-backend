@@ -133,13 +133,40 @@ export class UserService {
   }
 
   // TODO
-  // async updateUserExercise(
-  //   userId: string,
-  //   exerciseId: string,
-  //   isCompleted: boolean,
-  // ) {
-  //   await this.userExerciseModel.create({ isCompleted, userId, exerciseId });
-  // }
+  async createOrUpdateUserExercise(
+    isCompleted: boolean,
+    userId: string,
+    exerciseId: string,
+  ) {
+    // check if user-exercise row exists
+    const userExerciseAlreadyExists = await this.userExerciseModel.findOne({
+      where: { userId: userId, exerciseId: exerciseId },
+      raw: true,
+    });
+
+    if (userExerciseAlreadyExists) {
+      // exists + it's not completed and isComplted = true  => update to completed
+      if (!userExerciseAlreadyExists.isCompleted && isCompleted) {
+        await this.userExerciseModel.update(
+          { isCompleted },
+          { where: { userId, exerciseId } },
+        );
+        console.log(`Exercise ${exerciseId} successfuly completed`);
+      }
+      // no need update
+      else {
+        console.log('Exercise already completed');
+      }
+    } else {
+      // create the row in db
+      await this.userExerciseModel.create({
+        isCompleted,
+        userId,
+        exerciseId,
+      });
+      console.log(`Exercise ${exerciseId} successfuly completed`);
+    }
+  }
 
   async findOneById(id: string) {
     const user = await this.userModel.findOne<User>({

@@ -5,6 +5,7 @@ import {
   PrimaryKey,
   Unique,
   Length,
+  AllowNull,
   DataType,
   HasMany,
   ForeignKey,
@@ -23,7 +24,7 @@ export class Exercise extends Model<Exercise> {
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
   })
-  id: string;
+  declare id: string;
 
   @Unique
   @Length({ min: 3, max: 30 })
@@ -52,11 +53,16 @@ export class Exercise extends Model<Exercise> {
   tests: Validator[];
 
   @ForeignKey(() => Challenge)
+  @AllowNull(true)
   @Column({
     type: DataType.UUID,
   })
   challengeId: string;
 
-  @BelongsTo(() => Challenge)
+  @BelongsTo(() => Challenge, {
+    foreignKey: {
+      allowNull: true,
+    },
+  })
   challenge: Challenge;
 }

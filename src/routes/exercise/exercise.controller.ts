@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Request,
   Patch,
   Param,
   Delete,
@@ -38,15 +39,6 @@ export class ExerciseController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(':id')
-  checkExercise(
-    @Param('id') id: string,
-    @Body() checkExerciseDto: CheckExerciseDto,
-  ) {
-    return this.exerciseService.checkExercise(id, checkExerciseDto);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -59,5 +51,15 @@ export class ExerciseController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.exerciseService.remove(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('run/:id')
+  checkExercise(
+    @Param('id') id: string,
+    @Body() checkExerciseDto: CheckExerciseDto,
+    @Request() req: any,
+  ) {
+    return this.exerciseService.checkExercise(id, checkExerciseDto, req);
   }
 }

@@ -8,6 +8,7 @@ import { NodeRunnerService } from 'src/common/runner/node-runner.service';
 import { PythonRunnerService } from 'src/common/runner/python-runner.service';
 import { RustRunnerService } from 'src/common/runner/rust-runner.service';
 import { JavaRunnerService } from 'src/common/runner/java-runner.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class ExerciseService {
@@ -18,8 +19,10 @@ export class ExerciseService {
     private pythonRunnerService: PythonRunnerService,
     private rustRunnerService: RustRunnerService,
     private javaRunnerService: JavaRunnerService,
+    private userService: UserService,
   ) {}
 
+  // TODO: allowNull on challengeId
   async create(createExerciseDto: CreateExerciseDto) {
     // check if exercise already exists
     const exerciseAlreadyExist = await this.doesExerciseAlreadyExist(
@@ -43,9 +46,10 @@ export class ExerciseService {
     exercise.challengeId = createExerciseDto.challengeId;
 
     // save exercise in db
-    return await exercise.save();
+    return await this.exerciseModel.create(exercise);
   }
 
+  // TODO: handle quand challengeId n'est pas un vrai uuid
   async findAll(query: any) {
     let finalQuery = {};
     if (query.challengeId) {
@@ -56,12 +60,19 @@ export class ExerciseService {
   }
 
   async findOne(id: string) {
-    return await this.exerciseModel.findByPk(id);
+    return await this.exerciseModel.findOne({ where: { id }, raw: true });
   }
 
-  async checkExercise(id: string, checkExerciseDto: CheckExerciseDto) {
+  async checkExercise(
+    id: string,
+    checkExerciseDto: CheckExerciseDto,
+    req: any,
+  ) {
     // get exercise
-    const exercise = await this.exerciseModel.findByPk(id);
+    const exercise = await this.exerciseModel.findOne({
+      where: { id },
+      raw: true,
+    });
 
     if (!exercise) {
       throw new HttpException('Exercise not found', HttpStatus.NOT_FOUND);
@@ -69,6 +80,14 @@ export class ExerciseService {
 
     // run code
     const result = await this.runCode(checkExerciseDto);
+
+    // Handle user-exercise table
+    const userId = req.user.userId;
+    let isCompleted = false;
+    if (result.stdout.trim() === exercise.expectedResult) {
+      isCompleted = true;
+    }
+    await this.userService.createOrUpdateUserExercise(isCompleted, userId, id);
 
     return { expectedResult: exercise.expectedResult, result };
   }
@@ -85,7 +104,10 @@ export class ExerciseService {
     }
 
     // update exercise
-    const exercise = await this.exerciseModel.findByPk(id);
+    const exercise = await this.exerciseModel.findOne({
+      where: { id },
+      raw: true,
+    });
 
     if (!exercise) {
       throw new HttpException('Exercise not found', HttpStatus.NOT_FOUND);
@@ -100,28 +122,32 @@ export class ExerciseService {
     exercise.challengeId = updateExerciseDto.challengeId;
 
     // modify exercise in db
-    return await exercise.save();
+    await this.exerciseModel.update(exercise, { where: { id } });
+
+    return `Exercise ${id} successfuly updated`;
   }
 
   async remove(id: string) {
     // delete the exercise
-    const exercise = await this.exerciseModel.findByPk<Exercise>(id);
+    const exercise = await this.exerciseModel.findOne<Exercise>({
+      where: { id },
+      raw: true,
+    });
 
     if (!exercise) {
       throw new HttpException('Exercise not found', HttpStatus.NOT_FOUND);
     }
 
-    await exercise.destroy();
+    await this.exerciseModel.destroy({ where: { id } });
 
-    return 'Exercise deleted';
+    return `Exercise ${id} deleted`;
   }
 
   // other functions
   async doesExerciseAlreadyExist(name: string) {
-    return await this.exerciseModel.findOne({ where: { name } });
+    return await this.exerciseModel.findOne({ where: { name }, raw: true });
   }
 
-  // TODO: execute code in workers
   async runCode(checkExerciseDto: CheckExerciseDto) {
     const { language, inputCode } = checkExerciseDto;
 

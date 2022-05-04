@@ -2,6 +2,7 @@ import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { Challenge } from './entities/challenge.entity';
+import { Exercise } from '../exercise/entities/exercise.entity';
 
 @Injectable()
 export class ChallengeService {
@@ -31,7 +32,7 @@ export class ChallengeService {
     challenge.isPractice = createChallengeDto.isPractice || false;
 
     // save challenge in db
-    return await challenge.save();
+    return await this.challengeModel.create(challenge);
   }
 
   async findAll(query: any) {
@@ -39,11 +40,12 @@ export class ChallengeService {
 
     return await this.challengeModel.findAll({
       where: { isPractice: isPractice },
+      include: [Exercise],
     });
   }
 
   async findOne(id: string) {
-    return await this.challengeModel.findByPk(id);
+    return await this.challengeModel.findOne({ where: { id }, raw: true });
   }
 
   async update(id: string, updateChallengeDto: UpdateChallengeDto) {
@@ -58,7 +60,10 @@ export class ChallengeService {
     }
 
     // update challenge
-    const challenge = await this.challengeModel.findByPk(id);
+    const challenge = await this.challengeModel.findOne({
+      where: { id },
+      raw: true,
+    });
 
     if (!challenge) {
       throw new HttpException('Challenge not found', HttpStatus.NOT_FOUND);
@@ -71,24 +76,31 @@ export class ChallengeService {
     }
 
     // modify challenge in db
-    return await challenge.save();
+    await this.challengeModel.update(challenge, { where: { id } });
+
+    return `Challenge ${id} successfuly updated`;
   }
 
   async remove(id: string) {
     // delete the challenge
-    const challenge = await this.challengeModel.findByPk<Challenge>(id);
+    const challenge = await this.challengeModel.findOne<Challenge>({
+      where: { id },
+    });
 
     if (!challenge) {
       throw new HttpException('Challenge not found', HttpStatus.NOT_FOUND);
     }
 
-    await challenge.destroy();
+    await this.challengeModel.destroy({ where: { id } });
 
-    return 'Challenge deleted';
+    return `Challenge ${id} deleted`;
   }
 
   // other functions
   async doesChallengeAlreadyExist(name: string) {
-    return await this.challengeModel.findOne({ where: { name } });
+    return await this.challengeModel.findOne({
+      where: { name },
+      raw: true,
+    });
   }
 }

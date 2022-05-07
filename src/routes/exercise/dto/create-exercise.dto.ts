@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsString, Length, IsOptional } from 'class-validator';
 
 export class CreateExerciseDto {
   @Length(3, 30)
@@ -17,6 +17,6 @@ export class CreateExerciseDto {
   @IsNotEmpty()
   difficultyLevel: number;
 
-  @IsString()
+  @IsOptional()
   challengeId: string;
 }

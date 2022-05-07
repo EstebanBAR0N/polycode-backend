@@ -51,16 +51,7 @@ export class AuthService {
     // save user in db
     this.userService.create(user);
 
-    return `User ${user.id} successfuly created`;
-
-    // return the token
-    // return await this.login({
-    //   user: {
-    //     id: user.id,
-    //     username: user.username,
-    //     ...new LoginUserDto(user.email, createUserDto.password),
-    //   },
-    // });
+    return { message: `Your account as been created successfuly` };
   }
 
   async login(req: any): Promise<any> {
@@ -77,10 +68,12 @@ export class AuthService {
     const jwt_token = this.jwtService.sign(payload);
 
     // add token to bdd
-    await this.storeTokenInDatabase(user.id, jwt_token);
+    const token = await this.storeTokenInDatabase(user.id, jwt_token);
 
     return {
       access_token: jwt_token,
+      userId: user?.id,
+      expirationDate: token?.expirationDate,
     };
   }
 
@@ -122,7 +115,7 @@ export class AuthService {
   async storeTokenInDatabase(userId: string, token: string) {
     // store new token to database
     const creationDate = new Date(Date.now());
-    let expirationDate = new Date(creationDate);
+    const expirationDate = new Date(creationDate);
     expirationDate.setDate(expirationDate.getDate() + 1);
 
     const token_obj = new Token();
@@ -131,7 +124,10 @@ export class AuthService {
     token_obj.expirationDate = expirationDate;
     token_obj.userId = userId;
 
-    await this.tokenService.create(token_obj);
+    const result = await this.tokenService.create(token_obj);
+
+    // convert sequelize obj to usable object
+    return JSON.parse(JSON.stringify(result));
   }
 
   async isEmailConfirmed(userId: string) {

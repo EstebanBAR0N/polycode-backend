@@ -3,6 +3,8 @@ import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { Challenge } from './entities/challenge.entity';
 import { Exercise } from '../exercise/entities/exercise.entity';
+import { UserExercise } from '../user/entities/user-exercise.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class ChallengeService {
@@ -45,7 +47,10 @@ export class ChallengeService {
   }
 
   async findOne(id: string) {
-    return await this.challengeModel.findOne({ where: { id }, raw: true });
+    return await this.challengeModel.findOne({
+      where: { id },
+      include: [Exercise],
+    });
   }
 
   async update(id: string, updateChallengeDto: UpdateChallengeDto) {

@@ -1,7 +1,9 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class EmailConfirmationUserDto {
-  @IsOptional()
+  @IsString()
+  readonly email: string;
+
   @IsString()
   readonly confirmationEmailToken: string;
 }

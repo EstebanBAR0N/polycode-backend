@@ -92,16 +92,18 @@ export class UserService {
     // delete user in db
     await this.userModel.destroy({ where: { id } });
 
-    return `User ${id} successfuly deleted`; //new UserDto(user);
+    return `User ${id} successfuly deleted`;
   }
 
   // other functions
-  async emailConfirmation(
-    id: string,
-    emailConfirmationUserDto: EmailConfirmationUserDto,
-  ) {
+  async emailConfirmation(emailConfirmationUserDto: EmailConfirmationUserDto) {
+    console.log(emailConfirmationUserDto);
+
     // update user
-    const user = await this.userModel.findOne({ where: { id }, raw: true });
+    const user = await this.userModel.findOne({
+      where: { email: emailConfirmationUserDto.email },
+      raw: true,
+    });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -112,15 +114,19 @@ export class UserService {
     }
 
     if (
-      emailConfirmationUserDto.confirmationEmailToken ===
-      process.env.EMAIL_CONFIRMATION_TOKEN
+      emailConfirmationUserDto.confirmationEmailToken.trim() ===
+      user.emailConfirmationToken.trim()
     ) {
       user.isEmailConfirmed = true;
 
       // update user in db
-      await this.userModel.update(user, { where: { id } });
+      await this.userModel.update(user, {
+        where: { email: emailConfirmationUserDto.email },
+      });
 
-      return `Email successfuly confirmed by ${id}`;
+      return {
+        message: `Email successfuly confirmed by ${emailConfirmationUserDto.email}`,
+      };
     }
     throw new HttpException(
       'Incorrect email confirmaton token',
@@ -189,7 +195,7 @@ export class UserService {
 
     if (!user) {
       throw new HttpException(
-        `User with thie email: ${email} not found`,
+        `User with this email: ${email} not found`,
         HttpStatus.NOT_FOUND,
       );
     }
@@ -198,7 +204,10 @@ export class UserService {
   }
 
   async findOneByEmailForLogin(email: string): Promise<any> {
-    return await this.userModel.findOne<User>({ where: { email }, raw: true });
+    return await this.userModel.findOne<User>({
+      where: { email: email },
+      raw: true,
+    });
   }
 
   async doesUserAlreadyExist(username: string, email: string) {
@@ -212,7 +221,7 @@ export class UserService {
     } else if (username) {
       query = { where: { username }, raw: true };
     } else {
-      query = { where: { email } };
+      query = { where: { email: email } };
     }
 
     return await this.userModel.findOne(query);
@@ -220,5 +229,26 @@ export class UserService {
 
   hasTheAuthorization(id: string, req: any) {
     return req.user && req.user.userId == id;
+  }
+
+  async updateEmailConfirmationToken(
+    email: string,
+    emailConfirmationToken: string,
+  ) {
+    // update user
+    const user: User = await this.findOneByEmailForLogin(email);
+
+    if (!user) {
+      throw new HttpException(
+        `User with this email: ${email} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    // update user
+    user.emailConfirmationToken =
+      emailConfirmationToken || user.emailConfirmationToken;
+
+    // update user in db
+    await this.userModel.update(user, { where: { email: email } });
   }
 }

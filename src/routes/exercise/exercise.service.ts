@@ -89,7 +89,7 @@ export class ExerciseService {
     }
     await this.userService.createOrUpdateUserExercise(isCompleted, userId, id);
 
-    return { expectedResult: exercise.expectedResult, result };
+    return { isCompleted: isCompleted, result };
   }
 
   async update(id: string, updateExerciseDto: UpdateExerciseDto) {

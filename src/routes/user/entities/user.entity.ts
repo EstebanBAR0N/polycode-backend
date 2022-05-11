@@ -37,6 +37,9 @@ export class User extends Model<User> {
   isEmailConfirmed: boolean;
 
   @Column
+  emailConfirmationToken: string;
+
+  @Column
   password: string;
 
   @Column({ defaultValue: false })

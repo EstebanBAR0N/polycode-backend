@@ -1,3 +1,4 @@
+import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -7,6 +8,9 @@ import { TokenService } from 'src/routes/token/token.service';
 import { CreateUserDto } from 'src/routes/user/dto/create-user.dto';
 import { LoginUserDto } from 'src/routes/user/dto/login-user.dto';
 import { Token } from 'src/routes/token/entities/token.entity';
+
+// custom imports
+import { generateString } from '../utils/randomString';
 
 @Injectable()
 export class AuthService {
@@ -49,7 +53,10 @@ export class AuthService {
     user.password = hashPassword;
 
     // save user in db
-    this.userService.create(user);
+    await this.userService.create(user);
+
+    // send confirmation email
+    await this.sendEmail({ email: user.email });
 
     return { message: `Your account as been created successfuly` };
   }
@@ -68,12 +75,15 @@ export class AuthService {
     const jwt_token = this.jwtService.sign(payload);
 
     // add token to bdd
-    const token = await this.storeTokenInDatabase(user.id, jwt_token);
+    const expirationDateInTimeStamp: number = await this.storeTokenInDatabase(
+      user.id,
+      jwt_token,
+    );
 
     return {
       access_token: jwt_token,
       userId: user?.id,
-      expirationDate: token?.expirationDate,
+      expirationDate: expirationDateInTimeStamp,
     };
   }
 
@@ -88,6 +98,44 @@ export class AuthService {
     const tokenDelete = await this.tokenService.remove(token);
 
     return tokenDelete;
+  }
+
+  async sendEmail(body: any) {
+    console.log(body);
+    // generate new token to send
+    const token = generateString(10);
+
+    // update email confirmation token in db
+    await this.userService.updateEmailConfirmationToken(body?.email, token);
+
+    // send email
+    await axios.post(
+      process.env.SMTP_URL,
+      {
+        sender: {
+          name: 'noreply',
+          email: 'estebanbaron.pro@gmail.com',
+        },
+        to: [
+          {
+            email: body?.email,
+            name: body?.email.split('@')[0] || 'polycode user',
+          },
+        ],
+        subject: 'PolyCode email confirmation',
+        htmlContent:
+          '<html><head></head><body><p>Welcome to PolyCode ! Last step, confirm your email !</p> Code:' +
+          token +
+          '</p></body></html>',
+      },
+      {
+        headers: {
+          'api-key': process.env.API_KEY,
+        },
+      },
+    );
+
+    return { message: 'Email resend successfuly' };
   }
 
   // other functions
@@ -124,10 +172,9 @@ export class AuthService {
     token_obj.expirationDate = expirationDate;
     token_obj.userId = userId;
 
-    const result = await this.tokenService.create(token_obj);
+    await this.tokenService.create(token_obj);
 
-    // convert sequelize obj to usable object
-    return JSON.parse(JSON.stringify(result));
+    return expirationDate.getTime();
   }
 
   async isEmailConfirmed(userId: string) {

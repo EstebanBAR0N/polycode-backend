@@ -10,5 +10,6 @@ import { UserModule } from 'src/resources/user/user.module';
   imports: [DatabaseModule, RunnerModule, UserModule],
   controllers: [ExerciseController],
   providers: [ExerciseService, ...exerciseProviders],
+  exports: [ExerciseService],
 })
 export class ExerciseModule {}

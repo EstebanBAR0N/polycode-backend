@@ -12,7 +12,9 @@ import {
 } from 'sequelize-typescript';
 import { Token } from 'src/resources/token/entities/token.entity';
 import { Exercise } from 'src/resources/exercise/entities/exercise.entity';
+import { Challenge } from 'src/resources/challenge/entities/challenge.entity';
 import { UserExercise } from './user-exercise.entity';
+import { UserChallenge } from './user-challenge.entity';
 
 @Table({ tableName: 'User' })
 export class User extends Model<User> {
@@ -49,5 +51,8 @@ export class User extends Model<User> {
   tokens: Token[];
 
   @BelongsToMany(() => Exercise, () => UserExercise)
-  exercises: Exercise[];
+  userExercises: UserExercise[];
+
+  @BelongsToMany(() => Challenge, () => UserChallenge)
+  userChallenges: UserChallenge[];
 }

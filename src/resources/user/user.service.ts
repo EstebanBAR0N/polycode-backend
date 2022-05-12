@@ -2,9 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { Op } from 'sequelize';
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { EmailConfirmationUserDto } from './dto/email-confirmation-user.dto';
 import { User } from './entities/user.entity';
-import { UserExercise } from './entities/user-exercise.entity';
 import { UserDto } from './dto/user.dto';
 
 @Injectable()
@@ -12,8 +10,6 @@ export class UserService {
   constructor(
     @Inject('userModel')
     private userModel: typeof User,
-    @Inject('userExerciseModel')
-    private userExerciseModel: typeof UserExercise,
   ) {}
 
   async findOne(id: string, req: any) {
@@ -98,41 +94,6 @@ export class UserService {
   /* OTHER FUNCTIONS */
   async create(user: User) {
     await this.userModel.create(user);
-  }
-
-  async createOrUpdateUserExercise(
-    isCompleted: boolean,
-    userId: string,
-    exerciseId: string,
-  ) {
-    // check if user-exercise row exists
-    const userExerciseAlreadyExists = await this.userExerciseModel.findOne({
-      where: { userId: userId, exerciseId: exerciseId },
-      raw: true,
-    });
-
-    if (userExerciseAlreadyExists) {
-      // exists + it's not completed and isComplted = true  => update to completed
-      if (!userExerciseAlreadyExists.isCompleted && isCompleted) {
-        await this.userExerciseModel.update(
-          { isCompleted },
-          { where: { userId, exerciseId } },
-        );
-        console.log(`Exercise ${exerciseId} successfuly completed`);
-      }
-      // no need update
-      else {
-        console.log('Exercise already completed');
-      }
-    } else {
-      // create the row in db
-      await this.userExerciseModel.create({
-        isCompleted,
-        userId,
-        exerciseId,
-      });
-      console.log(`Exercise ${exerciseId} successfuly completed`);
-    }
   }
 
   async findOneById(id: string) {

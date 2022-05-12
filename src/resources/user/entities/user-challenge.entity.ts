@@ -4,8 +4,8 @@ import { Challenge } from 'src/resources/challenge/entities/challenge.entity';
 
 @Table({ tableName: 'UserChallenge' })
 export class UserChallenge extends Model<UserChallenge> {
-  @Column
-  nbOfExerciseCompleted: boolean;
+  @Column({ defaultValue: 0 })
+  nbOfExerciseCompleted: number;
 
   @ForeignKey(() => User)
   @Column

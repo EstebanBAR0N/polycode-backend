@@ -8,18 +8,22 @@ import { NodeRunnerService } from 'src/runners/node-runner.service';
 import { PythonRunnerService } from 'src/runners/python-runner.service';
 import { RustRunnerService } from 'src/runners/rust-runner.service';
 import { JavaRunnerService } from 'src/runners/java-runner.service';
-import { UserService } from '../user/user.service';
+import { UserExercise } from '../user/entities/user-exercise.entity';
+import { UserChallenge } from '../user/entities/user-challenge.entity';
 
 @Injectable()
 export class ExerciseService {
   constructor(
     @Inject('exerciseModel')
     private exerciseModel: typeof Exercise,
+    @Inject('userExerciseModel')
+    private userExerciseModel: typeof UserExercise,
+    @Inject('userChallengeModel')
+    private userChallengeModel: typeof UserChallenge,
     private nodeRunnerService: NodeRunnerService,
     private pythonRunnerService: PythonRunnerService,
     private rustRunnerService: RustRunnerService,
     private javaRunnerService: JavaRunnerService,
-    private userService: UserService,
   ) {}
 
   // TODO: allowNull on challengeId
@@ -87,7 +91,7 @@ export class ExerciseService {
     if (result.stdout.trim() === exercise.expectedResult) {
       isCompleted = true;
     }
-    await this.userService.createOrUpdateUserExercise(isCompleted, userId, id);
+    await this.createOrUpdateUserExercise(isCompleted, userId, id);
 
     return { isCompleted: isCompleted, result };
   }
@@ -144,6 +148,10 @@ export class ExerciseService {
   }
 
   /* OTHER FUNCTIONS */
+  async getExerciseById(id: string) {
+    return await this.exerciseModel.findOne({ where: { id: id } });
+  }
+
   async doesExerciseAlreadyExist(name: string) {
     return await this.exerciseModel.findOne({ where: { name }, raw: true });
   }
@@ -171,5 +179,76 @@ export class ExerciseService {
     }
 
     return result;
+  }
+
+  async createOrUpdateUserExercise(
+    isCompleted: boolean,
+    userId: string,
+    exerciseId: string,
+  ) {
+    // check if user-exercise row exists
+    const userExerciseAlreadyExists = await this.userExerciseModel.findOne({
+      where: { userId: userId, exerciseId: exerciseId },
+      raw: true,
+    });
+
+    const exercise = await this.exerciseModel.findOne({
+      where: { id: exerciseId },
+      raw: true,
+    });
+
+    if (userExerciseAlreadyExists) {
+      // exists + it's not completed and isComplted = true  => update to completed
+      if (!userExerciseAlreadyExists.isCompleted && isCompleted) {
+        await this.userExerciseModel.update(
+          { isCompleted },
+          { where: { userId, exerciseId } },
+        );
+
+        // update user-challenge too
+        await this.createOrUpdateUserChallenge(exercise, userId);
+
+        console.log(`Exercise ${exerciseId} successfuly completed`);
+      }
+      // no need update
+      else {
+        console.log('Exercise already completed');
+      }
+    } else {
+      // create the row in db
+      await this.userExerciseModel.create({
+        isCompleted,
+        userId,
+        exerciseId,
+      });
+      await this.createOrUpdateUserChallenge(exercise, userId);
+
+      console.log(`Exercise ${exerciseId} successfuly completed`);
+    }
+  }
+
+  async createOrUpdateUserChallenge(exercise: Exercise, userId: string) {
+    // udpate user-challenge table
+    const userChallenge = await this.userChallengeModel.findOne({
+      where: { userId: userId, challengeId: exercise.challengeId },
+      raw: true,
+    });
+
+    if (userChallenge) {
+      await this.userChallengeModel.update(
+        { nbOfExerciseCompleted: userChallenge.nbOfExerciseCompleted + 1 },
+        { where: { userId: userId, challengeId: exercise.challengeId } },
+      );
+      console.log(`Challenge ${exercise.challengeId} successfuly completed`);
+    } else {
+      // create the row in db
+      await this.userChallengeModel.create({
+        nbOfExerciseCompleted: 1,
+        userId: userId,
+        challengeId: exercise?.challengeId,
+      });
+
+      console.log(`Challenge ${exercise.challengeId} successfuly completed`);
+    }
   }
 }

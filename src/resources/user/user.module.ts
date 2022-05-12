@@ -5,6 +5,7 @@ import { UserController } from './user.controller';
 import { EmailController } from './email/email.controller';
 import { userProviders } from './user.providers';
 import { userExerciseProviders } from './user-exercise.providers';
+import { userChallengeProviders } from './user-challenge.providers';
 import { DatabaseModule } from 'src/database/database.module';
 
 @Module({
@@ -15,7 +16,13 @@ import { DatabaseModule } from 'src/database/database.module';
     EmailService,
     ...userProviders,
     ...userExerciseProviders,
+    ...userChallengeProviders,
   ],
-  exports: [UserService, EmailService],
+  exports: [
+    UserService,
+    EmailService,
+    ...userExerciseProviders,
+    ...userChallengeProviders,
+  ],
 })
 export class UserModule {}

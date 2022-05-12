@@ -13,10 +13,12 @@ async function bootstrap(): Promise<void> {
   // protection from some well-known web vulnerabilities by setting HTTP headers appropriately
   app.use(helmet());
 
-  // all routes start with /api/v1
+  // all routes prefixed by /api/v1
   app.setGlobalPrefix('api/v1');
 
+  // define port
   const port = process.env.PORT || '4000';
+
   await app.listen(port);
 }
 bootstrap();

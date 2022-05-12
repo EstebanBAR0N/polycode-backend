@@ -1,10 +1,10 @@
 import { Sequelize } from 'sequelize-typescript';
-import { User } from 'src/routes/user/entities/user.entity';
-import { Token } from 'src/routes/token/entities/token.entity';
-import { Exercise } from 'src/routes/exercise/entities/exercise.entity';
-import { UserExercise } from 'src/routes/user/entities/user-exercise.entity';
-import { Validator } from 'src/routes/validator/entities/validator.entity';
-import { Challenge } from 'src/routes/challenge/entities/challenge.entity';
+import { User } from 'src/resources/user/entities/user.entity';
+import { Token } from 'src/resources/token/entities/token.entity';
+import { Exercise } from 'src/resources/exercise/entities/exercise.entity';
+import { UserExercise } from 'src/resources/user/entities/user-exercise.entity';
+import { Validator } from 'src/resources/validator/entities/validator.entity';
+import { Challenge } from 'src/resources/challenge/entities/challenge.entity';
 
 export const databaseProviders = [
   {

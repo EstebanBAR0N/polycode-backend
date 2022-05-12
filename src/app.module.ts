@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { UserModule } from './routes/user/user.module';
-import { TokenModule } from './routes/token/token.module';
-import { ChallengeModule } from './routes/challenge/challenge.module';
+import { UserModule } from './resources/user/user.module';
+import { TokenModule } from './resources/token/token.module';
+import { ChallengeModule } from './resources/challenge/challenge.module';
 import { DatabaseModule } from './database/database.module';
-import { AuthModule } from './auth/auth.module';
-import { ExerciseModule } from './routes/exercise/exercise.module';
-import { ValidatorModule } from './routes/validator/validator.module';
-import { RunnerModule } from './common/runner/runner.module';
+import { AuthModule } from './resources/auth/auth.module';
+import { ExerciseModule } from './resources/exercise/exercise.module';
+import { ValidatorModule } from './resources/validator/validator.module';
+import { RunnerModule } from './runners/runner.module';
 
 @Module({
   imports: [
@@ -23,7 +21,7 @@ import { RunnerModule } from './common/runner/runner.module';
     RunnerModule,
     ConfigModule.forRoot(),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

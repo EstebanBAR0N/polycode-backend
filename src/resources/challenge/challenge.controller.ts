@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Request,
 } from '@nestjs/common';
 import { ChallengeService } from './challenge.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
@@ -54,5 +55,12 @@ export class ChallengeController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.challengeService.remove(id);
+  }
+
+  /* /challenge/progress [GET] */
+  @UseGuards(JwtAuthGuard)
+  @Get('progress/:id')
+  findProgress(@Param('id') id: string, @Request() req: any) {
+    return this.challengeService.findProgress(id, req);
   }
 }

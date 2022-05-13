@@ -10,6 +10,8 @@ export class ChallengeService {
   constructor(
     @Inject('challengeModel')
     private challengeModel: typeof Challenge,
+    @Inject('userChallengeModel')
+    private userChallengeModel: typeof UserChallenge,
   ) {}
 
   async create(createChallengeDto: CreateChallengeDto) {
@@ -98,6 +100,20 @@ export class ChallengeService {
     await this.challengeModel.destroy({ where: { id } });
 
     return `Challenge ${id} deleted`;
+  }
+
+  async findProgress(id: string, req: any) {
+    const userId = req.user.userId;
+
+    const userChallenge = await this.userChallengeModel.findOne({
+      where: { userId: userId, challengeId: id },
+    });
+
+    if (!userChallenge) {
+      throw new HttpException('Progres not found', HttpStatus.NOT_FOUND);
+    }
+
+    return userChallenge;
   }
 
   /* OTHER FUNCTIONS */

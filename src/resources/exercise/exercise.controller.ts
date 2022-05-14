@@ -14,7 +14,7 @@ import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { CheckExerciseDto } from './dto/check-exercise.dto';
-import { JwtAuthGuard } from 'src/resources/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../resources/auth/guards/jwt-auth.guard';
 
 @Controller('exercise')
 export class ExerciseController {

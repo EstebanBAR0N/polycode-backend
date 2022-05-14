@@ -8,8 +8,8 @@ import {
   DataType,
   HasMany,
 } from 'sequelize-typescript';
-import { Exercise } from 'src/resources/exercise/entities/exercise.entity';
-import { Language } from 'src/common/enum/language';
+import { Exercise } from '../../exercise/entities/exercise.entity';
+import { Language } from '../../../common/enum/language';
 
 @Table({ tableName: 'Challenge' })
 export class Challenge extends Model<Challenge> {

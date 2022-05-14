@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsBoolean, Length } from 'class-validator';
-import { Language } from 'src/common/enum/language';
+import { Language } from '../../../common/enum/language';
 
 export class CreateChallengeDto {
   @Length(3, 30)

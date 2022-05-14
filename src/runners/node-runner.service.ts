@@ -19,7 +19,11 @@ export class NodeRunnerService extends RunnerService {
     result = await docker
       .run(
         'node',
-        ['sh', '-c', `echo "${code.replaceAll('\"', '\\"')}" > index.js; node index.js`],
+        [
+          'sh',
+          '-c',
+          `echo "${code.replaceAll('"', '\\"')}" > index.js; node index.js`,
+        ],
         [stdout, stderr],
         { Tty: false },
       )

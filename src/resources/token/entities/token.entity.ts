@@ -3,13 +3,12 @@ import {
   Column,
   Model,
   PrimaryKey,
-  Unique,
   IsDate,
   DataType,
   ForeignKey,
   BelongsTo,
 } from 'sequelize-typescript';
-import { User } from 'src/resources/user/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Table({ tableName: 'Token' })
 export class Token extends Model<Token> {

@@ -9,7 +9,7 @@ import {
   ForeignKey,
   BelongsTo,
 } from 'sequelize-typescript';
-import { Exercise } from 'src/resources/exercise/entities/exercise.entity';
+import { Exercise } from '../../exercise/entities/exercise.entity';
 
 @Table({ tableName: 'Validator' })
 export class Validator extends Model<Validator> {

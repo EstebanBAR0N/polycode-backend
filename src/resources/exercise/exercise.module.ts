@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ExerciseService } from './exercise.service';
 import { ExerciseController } from './exercise.controller';
-import { DatabaseModule } from 'src/database/database.module';
+import { DatabaseModule } from '../../database/database.module';
 import { exerciseProviders } from './exercise.providers';
-import { RunnerModule } from 'src/runners/runner.module';
-import { UserModule } from 'src/resources/user/user.module';
+import { RunnerModule } from '../../runners/runner.module';
+import { UserModule } from '../../resources/user/user.module';
 
 @Module({
   imports: [DatabaseModule, RunnerModule, UserModule],

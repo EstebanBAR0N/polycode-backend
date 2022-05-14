@@ -10,9 +10,9 @@ import {
   HasMany,
   BelongsToMany,
 } from 'sequelize-typescript';
-import { Token } from 'src/resources/token/entities/token.entity';
-import { Exercise } from 'src/resources/exercise/entities/exercise.entity';
-import { Challenge } from 'src/resources/challenge/entities/challenge.entity';
+import { Token } from '../../token/entities/token.entity';
+import { Exercise } from '../../exercise/entities/exercise.entity';
+import { Challenge } from '../../challenge/entities/challenge.entity';
 import { UserExercise } from './user-exercise.entity';
 import { UserChallenge } from './user-challenge.entity';
 

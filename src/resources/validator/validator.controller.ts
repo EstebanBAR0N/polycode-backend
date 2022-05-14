@@ -1,18 +1,18 @@
 import {
   Controller,
-  UseGuards,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
+  // UseGuards,
+  // Get,
+  // Post,
+  // Body,
+  // Patch,
+  // Param,
+  // Delete,
 } from '@nestjs/common';
 import { ValidatorService } from './validator.service';
-import { CreateValidatorDto } from './dto/create-validator.dto';
-import { UpdateValidatorDto } from './dto/update-validator.dto';
-import { CheckValidatorDto } from './dto/check-validator.dto';
-import { JwtAuthGuard } from 'src/resources/auth/guards/jwt-auth.guard';
+// import { CreateValidatorDto } from './dto/create-validator.dto';
+// import { UpdateValidatorDto } from './dto/update-validator.dto';
+// import { CheckValidatorDto } from './dto/check-validator.dto';
+// import { JwtAuthGuard } from '../../resources/auth/guards/jwt-auth.guard';
 
 @Controller('validator')
 export class ValidatorController {

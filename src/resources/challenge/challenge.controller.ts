@@ -13,7 +13,7 @@ import {
 import { ChallengeService } from './challenge.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
-import { JwtAuthGuard } from 'src/resources/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../resources/auth/guards/jwt-auth.guard';
 
 @Controller('challenge')
 export class ChallengeController {

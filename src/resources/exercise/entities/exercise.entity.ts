@@ -12,10 +12,10 @@ import {
   BelongsTo,
   BelongsToMany,
 } from 'sequelize-typescript';
-import { User } from 'src/resources/user/entities/user.entity';
-import { Validator } from 'src/resources/validator/entities/validator.entity';
-import { Challenge } from 'src/resources/challenge/entities/challenge.entity';
-import { UserExercise } from 'src/resources/user/entities/user-exercise.entity';
+import { User } from '../../user/entities/user.entity';
+import { Validator } from '../../validator/entities/validator.entity';
+import { Challenge } from '../../challenge/entities/challenge.entity';
+import { UserExercise } from '../../user/entities/user-exercise.entity';
 
 @Table({ tableName: 'Exercise' })
 export class Exercise extends Model<Exercise> {

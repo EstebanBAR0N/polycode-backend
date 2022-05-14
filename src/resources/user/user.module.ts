@@ -6,7 +6,7 @@ import { EmailController } from './email/email.controller';
 import { userProviders } from './user.providers';
 import { userExerciseProviders } from './user-exercise.providers';
 import { userChallengeProviders } from './user-challenge.providers';
-import { DatabaseModule } from 'src/database/database.module';
+import { DatabaseModule } from '../../database/database.module';
 
 @Module({
   imports: [DatabaseModule],

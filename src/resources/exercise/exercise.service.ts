@@ -3,11 +3,11 @@ import { Exercise } from './entities/exercise.entity';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { CheckExerciseDto } from './dto/check-exercise.dto';
-import { Language } from 'src/common/enum/language';
-import { NodeRunnerService } from 'src/runners/node-runner.service';
-import { PythonRunnerService } from 'src/runners/python-runner.service';
-import { RustRunnerService } from 'src/runners/rust-runner.service';
-import { JavaRunnerService } from 'src/runners/java-runner.service';
+import { Language } from '../../common/enum/language';
+import { NodeRunnerService } from '../../runners/node-runner.service';
+import { PythonRunnerService } from '../../runners/python-runner.service';
+import { RustRunnerService } from '../../runners/rust-runner.service';
+import { JavaRunnerService } from '../../runners/java-runner.service';
 import { UserExercise } from '../user/entities/user-exercise.entity';
 import { UserChallenge } from '../user/entities/user-challenge.entity';
 

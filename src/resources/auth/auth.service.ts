@@ -1,13 +1,13 @@
 import * as bcrypt from 'bcrypt';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/resources/user/entities/user.entity';
-import { UserService } from 'src/resources/user/user.service';
-import { EmailService } from 'src/resources/user/email/email.service';
-import { TokenService } from 'src/resources/token/token.service';
-import { CreateUserDto } from 'src/resources/user/dto/create-user.dto';
-import { LoginUserDto } from 'src/resources/user/dto/login-user.dto';
-import { Token } from 'src/resources/token/entities/token.entity';
+import { User } from '../../resources/user/entities/user.entity';
+import { UserService } from '../../resources/user/user.service';
+import { EmailService } from '../../resources/user/email/email.service';
+import { TokenService } from '../../resources/token/token.service';
+import { CreateUserDto } from '../../resources/user/dto/create-user.dto';
+import { LoginUserDto } from '../../resources/user/dto/login-user.dto';
+import { Token } from '../../resources/token/entities/token.entity';
 
 @Injectable()
 export class AuthService {

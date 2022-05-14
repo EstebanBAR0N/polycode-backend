@@ -19,7 +19,11 @@ export class PythonRunnerService extends RunnerService {
     result = await docker
       .run(
         'python',
-        ['sh', '-c', `echo "${code.replaceAll('\"', '\\"')}" > index.py; python index.py`],
+        [
+          'sh',
+          '-c',
+          `echo "${code.replaceAll('"', '\\"')}" > index.py; python index.py`,
+        ],
         [stdout, stderr],
         { Tty: false },
       )

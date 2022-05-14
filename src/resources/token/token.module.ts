@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TokenService } from './token.service';
 import { tokenProviders } from './token.providers';
-import { DatabaseModule } from 'src/database/database.module';
+import { DatabaseModule } from '../../database/database.module';
 
 @Module({
   imports: [DatabaseModule],

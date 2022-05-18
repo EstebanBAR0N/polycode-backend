@@ -58,7 +58,6 @@ export class UserService {
     // update user
     user.username = updateUserDto.username || user.username;
     user.email = updateUserDto.email || user.email;
-    user.isAdmin = updateUserDto.isAdmin || false;
 
     if (updateUserDto.password) {
       // verify passwords
@@ -142,8 +141,10 @@ export class UserService {
       };
     } else if (username) {
       query = { where: { username }, raw: true };
-    } else {
+    } else if (email) {
       query = { where: { email: email } };
+    } else {
+      return false;
     }
 
     return await this.userModel.findOne(query);

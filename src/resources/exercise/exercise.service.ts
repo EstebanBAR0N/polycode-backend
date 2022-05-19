@@ -205,8 +205,10 @@ export class ExerciseService {
           { where: { userId, exerciseId } },
         );
 
-        // update user-challenge too
-        await this.createOrUpdateUserChallenge(exercise, userId);
+        if (exercise.challengeId) {
+          // update user-challenge too
+          await this.createOrUpdateUserChallenge(exercise, userId, isCompleted);
+        }
 
         console.log(`Exercise ${exerciseId} successfuly completed`);
       }
@@ -221,13 +223,21 @@ export class ExerciseService {
         userId,
         exerciseId,
       });
-      await this.createOrUpdateUserChallenge(exercise, userId);
+
+      if (exercise.challengeId) {
+        // update user-challenge too
+        await this.createOrUpdateUserChallenge(exercise, userId, isCompleted);
+      }
 
       console.log(`Exercise ${exerciseId} successfuly completed`);
     }
   }
 
-  async createOrUpdateUserChallenge(exercise: Exercise, userId: string) {
+  async createOrUpdateUserChallenge(
+    exercise: Exercise,
+    userId: string,
+    isCompleted: boolean,
+  ) {
     // udpate user-challenge table
     const userChallenge = await this.userChallengeModel.findOne({
       where: { userId: userId, challengeId: exercise.challengeId },
@@ -235,15 +245,21 @@ export class ExerciseService {
     });
 
     if (userChallenge) {
+      const nbOfExerciseCompleted = isCompleted
+        ? userChallenge.nbOfExerciseCompleted + 1
+        : userChallenge.nbOfExerciseCompleted;
+
       await this.userChallengeModel.update(
-        { nbOfExerciseCompleted: userChallenge.nbOfExerciseCompleted + 1 },
+        { nbOfExerciseCompleted: nbOfExerciseCompleted },
         { where: { userId: userId, challengeId: exercise.challengeId } },
       );
       console.log(`Challenge ${exercise.challengeId} successfuly completed`);
     } else {
+      const nbOfExerciseCompleted = isCompleted ? 1 : 0;
+
       // create the row in db
       await this.userChallengeModel.create({
-        nbOfExerciseCompleted: 1,
+        nbOfExerciseCompleted: nbOfExerciseCompleted,
         userId: userId,
         challengeId: exercise?.challengeId,
       });
